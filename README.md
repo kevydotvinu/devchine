@@ -1,3 +1,2 @@
 # Devchine
-
-## This creates a development virtual machine for the development.
+This creates a standalone virtual machine for the development.
