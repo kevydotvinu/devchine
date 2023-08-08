@@ -1,0 +1,31 @@
+#cloud-config
+preserve_hostname: False
+hostname: fedora-metallb
+fqdn: fedora-metallb.onp.example.local
+packages:
+  - zsh
+  - git
+  - pip
+  - podman
+  - make
+runcmd:
+  - [ modprobe, ip_tables ]
+  - [ modprobe, ip6_tables ]
+  - [ su, onp, -c, "git clone https://github.com/kevydotvinu/dotfiles /home/onp/code/src/github.com/kevydotvinu/dotfiles" ]
+  - [ su, onp, -c, "make -C /home/onp/code/src/github.com/kevydotvinu/dotfiles nvim" ]
+  - [ su, onp, -c, "make -C /home/onp/code/src/github.com/kevydotvinu/dotfiles ohmyzsh" ]
+  - [ su, onp, -c, "make -C /home/onp/code/src/github.com/kevydotvinu/dotfiles go-download" ]
+  - [ su, onp, -c, "make -C /home/onp/code/src/github.com/kevydotvinu/dotfiles kind-download" ]
+  - [ su, onp, -c, "git clone https://github.com/kevydotvinu/metallb-metallb /home/onp/code/src/github.com/kevydotvinu/metallb-metallb" ]
+  - [ su, onp, -c, "pip3 install invoke semver" ]
+  - [ ln, -sfv, /usr/bin/podman, /usr/bin/docker ]
+output:
+  all: ">> /var/log/cloud-init.log"
+users:
+  - name: onp
+    plain_text_passwd: 'Onp@123'
+    lock-passwd: False
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: sudo
+    shell: /bin/bash
+ssh_pwauth: True
