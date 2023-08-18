@@ -9,4 +9,7 @@ tail -f /var/log/cloud-init.log
 sudo virsh destroy metallb
 sudo qemu-img resize /opt/openshift-network-playground/libvirt/metallb/metallb.qcow2 +10G
 sudo virsh start metallb
+ssh onp@<vm> (password: Onp@123)
+cd metallb-metallb
+inv dev-env
 ```
