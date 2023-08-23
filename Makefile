@@ -4,16 +4,16 @@ METALLB_CLOUDINIT_USER ?= ./metallb-metallb/fedora-user-data.yaml
 METALLB_CLOUDINIT_NETWORK ?= ./metallb-metallb/fedora-network-dhcp-v1.yaml
 METALLB_IMAGE ?= https://download.fedoraproject.org/pub/fedora/linux/releases/38/Cloud/x86_64/images/Fedora-Cloud-Base-38-1.6.x86_64.qcow2
 
-check-metallb-ip:
-ifndef METALLB_IP
-        $(error METALLB_IP is undefined)
-endif
-
 .PHONY: help
 
 help:
 	@echo "AVAILABLE TARGETS"
 	@awk '/^.PHONY:/ {print $$2}' ${PWD}/Makefile
+
+check-metallb-ip:
+ifndef METALLB_IP
+	$(error METALLB_IP is undefined)
+endif
 
 .PHONY: metallb
 
@@ -23,7 +23,9 @@ metallb:
 .PHONY: resize-disk
 
 resize-disk:
-	@qemu-img resize ${METALLB_DIR}/metallb.qcow2 10G
+	@sudo virsh destroy metallb || true && sudo qemu-img resize ${METALLB_DIR}/metallb.qcow2 10G
+
+.PHONY: ssh-dnat
 
 ssh-dnat: check-metallb-ip
-	@iptables -t nat -I POSTROUTING --dport 2222 -j DNAT --to-destination ${METALLB_IP}:22
+	@sudo /usr/sbin/iptables -t nat -C PREROUTING -p tcp -i $$(/usr/sbin/ip route show default | awk '{print $$5}') --dport 2222 -j DNAT --to-destination ${METALLB_IP}:22 || sudo /usr/sbin/iptables -t nat -I PREROUTING -p tcp -i $$(/usr/sbin/ip route show default | awk '{print $$5}') --dport 2222 -j DNAT --to-destination ${METALLB_IP}:22
