@@ -30,3 +30,8 @@ resize-disk:
 ssh-dnat: check-metallb-ip
 	@sudo iptables-save | grep '\--dport 2222' && sudo iptables -t nat $$(sudo iptables-save | grep '\--dport 2222' | sed 's/^-A/-D/') || true
 	@sudo /usr/sbin/iptables -t nat -I PREROUTING -p tcp -i $$(/usr/sbin/ip route show default | awk '{print $$5}') --dport 2222 -j DNAT --to-destination ${METALLB_IP}:22
+
+.PHONY: edit-ssh
+
+edit-ssh: check-metallb-ip
+	@ssh onp@${METALLB_IP} 'bash -s' < metallb-metallb/gpg.sh
