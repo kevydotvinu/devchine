@@ -23,7 +23,7 @@ metallb:
 .PHONY: resize-disk
 
 resize-disk:
-	@sudo virsh destroy metallb || true && sudo qemu-img resize ${METALLB_DIR}/metallb.qcow2 10G
+	@sudo virsh destroy metallb || true && sudo qemu-img resize ${METALLB_DIR}/metallb.qcow2 10G && sudo virsh start metallb
 
 .PHONY: ssh-dnat
 
