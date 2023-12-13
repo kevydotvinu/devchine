@@ -1,6 +1,20 @@
 # Devchine
 This creates a standalone virtual machine for the development.
 
+## Prerequisites
+### Install packages
+```
+sudo yum install cloud-utils
+```
+### Create bridge interface
+```
+sudo ip link add name baremetal type bridge
+sudo ip link set dev baremetal up
+sudo ip link add bridge-dummy type dummy
+sudo ip link set dev bridge-dummy master baremetal
+sudo ip addr add 192.168.123.1/24 dev baremetal
+```
+
 ## MetalLB
 ```
 make metallb
