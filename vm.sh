@@ -17,12 +17,18 @@ VM_NAME=${VM_NAME%.*}
 IMAGE_NAME=$(basename -- ${IMAGE})
 EXTENSION=${IMAGE_NAME##*.}
 DISK=${DIRECTORY}/${VM_NAME}.${EXTENSION}
+DOWNLOAD=$(dirname ${DIRECTORY})/${VM_NAME}.${EXTENSION}
+REMOTE_IMAGE_SIZE=$(curl -s -L -I ${IMAGE} | awk -v IGNORECASE=1 '/^Content-Length/ { print $2 }')
+LOCAL_IMAGE_SIZE=$(du -b ${DOWNLOAD} | awk '{print $1}' 2>/dev/null || echo "")
 
 sudo rm -rf ${DIRECTORY}
 sudo mkdir -p ${DIRECTORY}
 sudo cloud-localds -m local --network-config=${CLOUDINIT_NETWORK_CONFIG} ${DIRECTORY}/seed.iso ${CLOUDINIT_USER_DATA}
-echo "Downloading ${VM_NAME} image ..."
-sudo curl -#Lo ${DISK} ${IMAGE}
+if [[ ${REMOTE_IMAGE_SIZE%$'\r'} != ${LOCAL_IMAGE_SIZE} ]]; then
+        echo "Downloading ${VM_NAME} image ..."
+        sudo curl -#Lo ${DOWNLOAD} ${IMAGE}
+fi
+sudo cp ${DOWNLOAD} ${DISK}
 
 sudo virsh -q destroy ${VM_NAME} > /dev/null || true
 sudo virsh -q undefine ${VM_NAME} > /dev/null || true
@@ -31,13 +37,13 @@ sudo virt-install --name ${VM_NAME} \
                   --ram 2048 \
                   --os-variant fedora-unknown \
                   --import \
- 		  ${NETWORK} \
+                  ${NETWORK} \
                   --disk ${DISK} \
-		  --disk ${DIRECTORY}/seed.iso \
+                  --disk ${DIRECTORY}/seed.iso \
                   --graphics spice,listen=${HOST_IP} \
                   --video virtio \
                   --channel spicevmc \
-		  --console pty,target.type=virtio \
+                  --console pty,target.type=virtio \
                   --serial pty \
                   --noautoconsole
 sudo virsh console ${VM_NAME}

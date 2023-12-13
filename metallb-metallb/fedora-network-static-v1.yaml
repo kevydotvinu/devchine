@@ -1,0 +1,11 @@
+network:
+  version: 1
+  config:
+    - type: physical
+      name: eth0
+      subnets:
+        - type: static
+          address: 192.168.123.9
+          gateway: 192.168.123.1
+          dns_nameservers:
+            - 8.8.8.8
