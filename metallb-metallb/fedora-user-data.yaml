@@ -19,7 +19,7 @@ runcmd:
   - [ su, onp, -c, "make -C /home/onp/dotfiles go-download GO_VERSION=go" ]
   - [ su, onp, -c, "make -C /home/onp/dotfiles kind-download" ]
   - [ su, onp, -c, "make -C /home/onp/dotfiles fzf" ]
-  - [ su, onp, -c, "git clone https://github.com/kevydotvinu/metallb-metallb /home/onp/metallb-metallb" ]
+  - [ su, onp, -c, "git clone https://github.com/kevydotvinu/metallb-metallb /home/onp/code/src/go.universe.tf/metallb" ]
   - [ su, onp, -c, "pip3 install invoke semver" ]
   - [ su, onp, -c, "gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 14D8B9397A8F10DA44B00FE3B5CCF2B7D917627C" ]
   - [ ln, -sfv, /usr/bin/podman, /usr/bin/docker ]
